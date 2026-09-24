@@ -1,0 +1,195 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
+local player = Players.LocalPlayer
+
+-- Create GUI
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "HitboxExpanderGui"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "MainFrame"
+mainFrame.Size = UDim2.new(0, 220, 0, 210)
+mainFrame.Position = UDim2.new(0.5, -110, 0.4, 0)
+mainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+mainFrame.BorderSizePixel = 0
+mainFrame.Active = true
+mainFrame.Draggable = true
+mainFrame.Parent = screenGui
+
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 8)
+corner.Parent = mainFrame
+
+-- Title
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Size = UDim2.new(1, 0, 0, 30)
+titleLabel.BackgroundTransparency = 1
+titleLabel.Text = "Hitbox Expander"
+titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleLabel.TextSize = 14
+titleLabel.Font = Enum.Font.SourceSansBold
+titleLabel.Parent = mainFrame
+
+-- Toggle Button
+local toggleButton = Instance.new("TextButton")
+toggleButton.Size = UDim2.new(0.85, 0, 0, 32)
+toggleButton.Position = UDim2.new(0.075, 0, 0.17, 0)
+toggleButton.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+toggleButton.Text = "Hitbox: OFF"
+toggleButton.TextColor3 = Color3.fromRGB(200, 50, 50)
+toggleButton.TextSize = 13
+toggleButton.Font = Enum.Font.SourceSansBold
+toggleButton.BorderSizePixel = 0
+toggleButton.Parent = mainFrame
+
+local btnCorner = Instance.new("UICorner")
+btnCorner.CornerRadius = UDim.new(0, 6)
+btnCorner.Parent = toggleButton
+
+-- Size Field
+local sizeLabel = Instance.new("TextLabel")
+sizeLabel.Size = UDim2.new(0.5, 0, 0, 25)
+sizeLabel.Position = UDim2.new(0.075, 0, 0.38, 0)
+sizeLabel.BackgroundTransparency = 1
+sizeLabel.Text = "Size:"
+sizeLabel.TextColor3 = Color3.fromRGB(180, 180, 180)
+sizeLabel.TextSize = 12
+sizeLabel.Font = Enum.Font.SourceSans
+sizeLabel.TextXAlignment = Enum.TextXAlignment.Left
+sizeLabel.Parent = mainFrame
+
+local sizeInput = Instance.new("TextBox")
+sizeInput.Size = UDim2.new(0.35, 0, 0, 25)
+sizeInput.Position = UDim2.new(0.575, 0, 0.38, 0)
+sizeInput.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+sizeInput.Text = "10"
+sizeInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+sizeInput.TextSize = 12
+sizeInput.Font = Enum.Font.SourceSans
+sizeInput.BorderSizePixel = 0
+sizeInput.Parent = mainFrame
+
+local sizeCorner = Instance.new("UICorner")
+sizeCorner.CornerRadius = UDim.new(0, 4)
+sizeCorner.Parent = sizeInput
+
+-- Transparency Field
+local transLabel = Instance.new("TextLabel")
+transLabel.Size = UDim2.new(0.5, 0, 0, 25)
+transLabel.Position = UDim2.new(0.075, 0, 0.54, 0)
+transLabel.BackgroundTransparency = 1
+transLabel.Text = "Transparency:"
+transLabel.TextColor3 = Color3.fromRGB(180, 180, 180)
+transLabel.TextSize = 12
+transLabel.Font = Enum.Font.SourceSans
+transLabel.TextXAlignment = Enum.TextXAlignment.Left
+transLabel.Parent = mainFrame
+
+local transInput = Instance.new("TextBox")
+transInput.Size = UDim2.new(0.35, 0, 0, 25)
+transInput.Position = UDim2.new(0.575, 0, 0.54, 0)
+transInput.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+transInput.Text = "0.5"
+transInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+transInput.TextSize = 12
+transInput.Font = Enum.Font.SourceSans
+transInput.BorderSizePixel = 0
+transInput.Parent = mainFrame
+
+local transCorner = Instance.new("UICorner")
+transCorner.CornerRadius = UDim.new(0, 4)
+transCorner.Parent = transInput
+
+-- Part Field
+local partLabel = Instance.new("TextLabel")
+partLabel.Size = UDim2.new(0.5, 0, 0, 25)
+partLabel.Position = UDim2.new(0.075, 0, 0.70, 0)
+partLabel.BackgroundTransparency = 1
+partLabel.Text = "Part Name:"
+partLabel.TextColor3 = Color3.fromRGB(180, 180, 180)
+partLabel.TextSize = 12
+partLabel.Font = Enum.Font.SourceSans
+partLabel.TextXAlignment = Enum.TextXAlignment.Left
+partLabel.Parent = mainFrame
+
+local partInput = Instance.new("TextBox")
+partInput.Size = UDim2.new(0.35, 0, 0, 25)
+partInput.Position = UDim2.new(0.575, 0, 0.70, 0)
+partInput.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+partInput.Text = "HumanoidRootPart"
+partInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+partInput.TextSize = 11
+partInput.Font = Enum.Font.SourceSans
+partInput.BorderSizePixel = 0
+partInput.Parent = mainFrame
+
+local partCorner = Instance.new("UICorner")
+partCorner.CornerRadius = UDim.new(0, 4)
+partCorner.Parent = partInput
+
+-- Logic Execution
+local hitboxEnabled = false
+local hitboxSize = 10
+local hitboxTransparency = 0.5
+local targetPartName = "HumanoidRootPart"
+
+sizeInput:GetPropertyChangedSignal("Text"):Connect(function()
+	local num = tonumber(sizeInput.Text)
+	if num and num >= 0 then
+		hitboxSize = num
+	end
+end)
+
+transInput:GetPropertyChangedSignal("Text"):Connect(function()
+	local num = tonumber(transInput.Text)
+	if num and num >= 0 and num <= 1 then
+		hitboxTransparency = num
+	end
+end)
+
+partInput:GetPropertyChangedSignal("Text"):Connect(function()
+	if partInput.Text ~= "" then
+		targetPartName = partInput.Text
+	end
+end)
+
+toggleButton.MouseButton1Click:Connect(function()
+	hitboxEnabled = not hitboxEnabled
+	if hitboxEnabled then
+		toggleButton.Text = "Hitbox: ON"
+		toggleButton.TextColor3 = Color3.fromRGB(50, 200, 50)
+	else
+		toggleButton.Text = "Hitbox: OFF"
+		toggleButton.TextColor3 = Color3.fromRGB(200, 50, 50)
+		
+		-- Reset all players hitboxes back to original state
+		for _, otherPlayer in pairs(Players:GetPlayers()) do
+			if otherPlayer ~= player and otherPlayer.Character then
+				local part = otherPlayer.Character:FindFirstChild(targetPartName)
+				if part and part:IsA("BasePart") then
+					part.Size = Vector3.new(2, 2, 1)
+					part.Transparency = 1
+					part.CanCollide = true
+				end
+			end
+		end
+	end
+end)
+
+RunService.RenderStepped:Connect(function()
+	if hitboxEnabled then
+		for _, otherPlayer in pairs(Players:GetPlayers()) do
+			if otherPlayer ~= player and otherPlayer.Character then
+				local part = otherPlayer.Character:FindFirstChild(targetPartName)
+				if part and part:IsA("BasePart") then
+					part.Size = Vector3.new(hitboxSize, hitboxSize, hitboxSize)
+					part.Transparency = hitboxTransparency
+					part.CanCollide = false
+				end
+			end
+		end
+	end
+end)
